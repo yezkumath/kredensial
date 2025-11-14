@@ -253,7 +253,10 @@ export default function Page({
             {isInput ? (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button className="bg-green-400 shadow-xl ml-6">
+                  <Button
+                    onClick={() => setIsOpen(true)}
+                    className="bg-green-400 shadow-xl ml-6"
+                  >
                     <Plus /> Dokumen
                   </Button>
                 </TooltipTrigger>

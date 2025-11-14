@@ -13,13 +13,29 @@ export async function GET_logbook_detail(
 ) {
   return await getDataQuery(
     `
-    SELECT * FROM view_credential_logbook 
-    WHERE id_document = @id_document
-    AND (create_nip =  @create_nip OR create_nip IS NULL)`,
-    { id_document, create_nip },
-    `GET_logbook
-        id_document: ${id_document},
-        create_nip: ${create_nip}`
+SELECT dl.id,  dl.id_document, dl.id_category_logbook, cl.declaration AS category_logbook_name, dl.count_min, 
+        l.id as id_logbook,   l.note AS logbook_note, 
+    l.drug AS logbook_drug, 
+    l.sop AS logbook_sop, l.supervisor_nip,  e.nama AS supervisor_name, l.create_nip, l.create_date,  (
+        SELECT TOP 1 declaration 
+        FROM credential_access_detail 
+        WHERE l.create_nip = nakes_nip 
+            AND access = 5
+    ) AS nakes_unit
+FROM credential_document_logbook dl
+LEFT  JOIN credential_category_logbook cl
+ON dl.id_category_logbook = cl.id
+LEFT JOIN credential_logbook l
+ON cl.id = l.id_document_category
+AND l.create_nip = @create_nip
+LEFT JOIN tb_employees e
+    ON l.supervisor_nip = e.nip
+WHERE dl.id_document = @id_document
+   `,
+    { create_nip: String(create_nip), id_document },
+    `GET_logbook_detail
+     create_nip: ${create_nip}
+        id_document: ${id_document}`
   );
 }
 
@@ -295,20 +311,16 @@ export async function PUT_logbook(
   );
 }
 
-export async function PUT_Approve_logbook(
-  id: number,
-  sop: number,
-  supervisor_nip: string
-) {
+export async function PUT_Approve_logbook(id: number, sop: number) {
   const loginData = await GetLoginCookie();
   const create_nip = loginData?.nip;
   return await executeTransaction(
     [
       {
         query: `UPDATE credential_logbook
-                SET sop = @sop, supervisor_nip = @supervisor_nip
+                SET sop = @sop, supervisor_nip = @create_nip
                 WHERE id= @id`,
-        params: { sop, supervisor_nip, id },
+        params: { sop, create_nip, id },
       },
       {
         query: `INSERT INTO credential_log_activity
@@ -319,7 +331,7 @@ export async function PUT_Approve_logbook(
           table_name: "credential_logbook",
           id_data: id,
           action_ontable: "UPDATE",
-          action_detail: "UPDATE Sop and supervisor_nip",
+          action_detail: `UPDATE Sop and supervisor_nip ${create_nip}`,
           create_nip: create_nip,
         },
       },
@@ -327,8 +339,7 @@ export async function PUT_Approve_logbook(
     `PUT_logbook
     id: ${id},
     sop: ${sop},
-    supervisor_nip: ${supervisor_nip},
-    create_nip: ${create_nip}`
+    supervisor_nip: ${create_nip}3`
   );
 }
 

@@ -15,6 +15,10 @@ export async function getDataQuery<T = any>(
     pool = await getDbConnection();
     const request = new sql.Request(pool);
 
+    // Add debug logging to see actual values
+    console.log("🔍 Params received:", params);
+    console.log("🔍 Query:", query);
+
     // Add parameters safely
     Object.entries(params).forEach(([key, value]) => {
       request.input(key, value);

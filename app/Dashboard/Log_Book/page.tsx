@@ -12,6 +12,7 @@ import {
 import { GetLoginCookie } from "@/function/cookie/loginData";
 import Log_Book from "@/components/pages/log_book/log_book";
 import { SetCookieAccessAs } from "@/function/cookie/access";
+import { SetCookieMedicalPersonal } from "@/function/cookie/medicalPersonnel";
 
 export default function Page() {
   const [nip, setNip] = useState("");
@@ -27,6 +28,7 @@ export default function Page() {
     if (nip === "") {
       const loginData = await GetLoginCookie();
       nip = loginData?.nip;
+      await SetCookieMedicalPersonal(nip);
     }
     if (nip) {
       setNip(nip);
@@ -65,6 +67,7 @@ export default function Page() {
     toast.error("Gagal mengambil data Document di Log-Book");
     return null;
   } else {
+    console.log(`nip : ${nip}, data: ${data}`);
     return (
       <div>
         <Log_Book data={data ?? []} />

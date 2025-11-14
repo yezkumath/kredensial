@@ -46,6 +46,7 @@ import {
   PUT_credential_document_activation,
   DELETE_credential_document,
   GET_credential_document_use,
+  DELETE_credential_hierarchy,
 } from "@/connection/credentials/document";
 import { DocumentCredential } from "@/connection/interface";
 import Dialog_InputEdit_Document from "./input-edit_Document";
@@ -166,15 +167,6 @@ export default function Page({ redirecPage }: { redirecPage: string }) {
     }
   };
 
-  // const setDateUpdate = async (id: number, dateCreate: Date) => {
-  //   const result = await getLastUpdateDate(id);
-  //   if (result && result.length > 0) {
-  //     setUpdateDate(new Date(result[0]));
-  //   } else {
-  //     setUpdateDate(dateCreate);
-  //   }
-  // };
-
   const handleCheckboxChange = async (id: number, checked: number) => {
     // User clicks checkbox
     // ↓
@@ -227,29 +219,17 @@ export default function Page({ redirecPage }: { redirecPage: string }) {
       toast.error("Data yang ingin di Hapus tidak ditemukan");
       return;
     }
-    // try {
-    //   const result = await DeleteDocument(selectedDetail.id, nip);
-    //   if (result) {
-    //     await fetchData();
-    //     toast.remove("Dokumen berhasil di Hapus!");
-    //   }
-    //   await mutate();
-    //   setIsDialogOpen(false);
-    // } catch (error) {
-    //   console.error("Error in handleEdit:", error);
-    //   toast.error("Gagal memperbarui dokumen");
-    // }
-    // Optimistic data (remove item immediately)
-
     const optimisticData = data.filter((item) => item.id !== selectedDetail.id);
 
     try {
       await mutate(
         async () => {
           // Call your DELETE API
-          const result = await DELETE_credential_document(selectedDetail.id);
+          const result = await DELETE_credential_hierarchy(selectedDetail.id);
 
-          if (!result) throw new Error("Delete failed");
+          if (!result || !result.success) {
+            throw new Error(result?.message || "Delete failed");
+          }
 
           return optimisticData;
         },
@@ -613,12 +593,16 @@ export default function Page({ redirecPage }: { redirecPage: string }) {
             )}
           </div>
           <div className="space-x-5 text-center">
-            <Button
-              className="bg-green-500 w-56"
-              disabled={totalDocumentUse > 0}
-            >
-              Hapus
-            </Button>
+            <DialogClose asChild>
+              <Button
+                className="bg-green-500 w-56"
+                disabled={totalDocumentUse > 0}
+                onClick={() => handleDelete()}
+              >
+                Hapus
+              </Button>
+            </DialogClose>
+
             <DialogClose asChild>
               <Button variant={"destructive"} className="w-56">
                 Batal

@@ -101,7 +101,7 @@ export const ChapterRow: React.FC<ChapterRowProps> = ({
             <TableCell className="bg-yellow-50">
               {/* MITRABERSARI */}
               <div className=" w-[119px] h-8 font-bold text-xl flex justify-center items-center">
-                {selectedChapterMitrabersari[chapter.id_chapter]}
+                {selectedChapterMitrabersari[chapter.id_chapter] || "-"}
               </div>
             </TableCell>
           </>
@@ -399,8 +399,9 @@ export const QuestionRow: React.FC<QuestionRowProps> = ({
             <TableCell className="bg-yellow-50">
               {/* MITRABERSARI */}
               <div className=" w-[119px] h-8 font-bold text-xl flex justify-center items-center">
-                {question.id_question &&
-                  selectedQuestionMitrabersari[question.id_question]}
+                {(question.id_question &&
+                  selectedQuestionMitrabersari[question.id_question]) ||
+                  "-"}
               </div>
             </TableCell>
           </>
@@ -694,8 +695,11 @@ export const SubQuestionRow: React.FC<SubQuestionRowProps> = ({
             <TableCell className="bg-yellow-50">
               {/* MITRABERSARI */}
               <div className=" w-[119px] h-8 font-bold text-xl flex justify-center items-center">
-                {subQuestion.id_sub_question &&
-                  selectedSubQuestionMitrabersari[subQuestion.id_sub_question]}
+                {(subQuestion.id_sub_question &&
+                  selectedSubQuestionMitrabersari[
+                    subQuestion.id_sub_question
+                  ]) ||
+                  "-"}
               </div>
             </TableCell>
           </>

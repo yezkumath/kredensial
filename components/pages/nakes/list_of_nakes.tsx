@@ -28,7 +28,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import {
@@ -179,18 +179,6 @@ export default function Page({ redirecPage }: { redirecPage: string }) {
               {acc.access_name}
             </TabsTrigger>
           ))}
-          {/* <TabsTrigger value="1" className="data-[state=active]:bg-green-300">
-            Komite
-          </TabsTrigger>
-          <TabsTrigger value="2" className="data-[state=active]:bg-green-300">
-            Mitrabersari
-          </TabsTrigger>
-          <TabsTrigger value="3" className="data-[state=active]:bg-green-300">
-            Kepala Instalasi
-          </TabsTrigger>
-          <TabsTrigger value="4" className="data-[state=active]:bg-green-300">
-            PJ Pelayanan
-          </TabsTrigger> */}
         </TabsList>
       </Tabs>
 

@@ -24,7 +24,7 @@ export default function Page() {
     await ResetCookieDocumentLogBook();
     if (nip === "") {
       const medicalPersonal = await GetCookieMedicalPersonal();
-      nip = medicalPersonal?.nip;
+      nip = medicalPersonal;
     }
     if (nip) {
       setNip(nip);
@@ -63,6 +63,7 @@ export default function Page() {
     toast.error("Gagal mengambil data Document di Log-Book");
     return null;
   } else {
+    console.log(`nip : ${nip}, data: ${data}`);
     return (
       <div>
         <Log_Book data={data ?? []} />

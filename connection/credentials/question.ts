@@ -126,6 +126,38 @@ export async function DELETE_chapter(id: number) {
     create_nip: ${create_nip}`
   );
 }
+
+export async function DELETE_chapter_use_iddocument(id_document: number) {
+  const loginData = await GetLoginCookie();
+  const create_nip = loginData?.nip;
+  return await executeTransaction(
+    [
+      {
+        query: `
+                DELETE credential_question_chapter 
+                WHERE id_document = @id_document`,
+        params: { id_document },
+      },
+      {
+        query: `INSERT INTO credential_log_activity
+                (table_name, id_data, action_ontable, action_detail, create_nip)
+                VALUES 
+                (@table_name, @id_data, @action_ontable, @action_detail, @create_nip)`,
+        params: {
+          table_name: "credential_question_chapter",
+          id_data: id_document,
+          action_ontable: "DELETE",
+          action_detail: "DELETE chapter by id document",
+          create_nip: create_nip,
+        },
+      },
+    ],
+    `DELETE_chapter_use_iddocument
+    id: ${id_document}
+    create_nip: ${create_nip}`
+  );
+}
+
 export async function DELETE_question_use_idchapter(id: number) {
   const loginData = await GetLoginCookie();
   const create_nip = loginData?.nip;
@@ -217,10 +249,7 @@ export async function PATCH_DELETE_chapter(id: number) {
                 VALUES 
                 (@table_name, @id_data, @action_ontable, @action_detail, @create_nip)`,
         params: {
-          table_name: `
-                    credential_question_subquestion, 
-                    credential_question_question, 
-                    credential_question_chapter`,
+          table_name: `chapter_question_subquestion`,
           id_data: id,
           action_ontable: "DELETE",
           action_detail: "DELETE value",

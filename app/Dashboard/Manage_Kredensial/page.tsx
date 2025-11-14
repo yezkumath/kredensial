@@ -22,12 +22,11 @@ export default function Page() {
   };
   return (
     <div>
-      <span>Applikasi Kredensial</span>
       <Dialog_InputEdit_Document
         onSuccess={handleDocumentCreated}
         isInput={true}
       />
-      <ListOfCredential redirecPage="Input_Document" />
+      <ListOfCredential redirecPage="Input_Document" key={refreshKey} />
     </div>
   );
 }

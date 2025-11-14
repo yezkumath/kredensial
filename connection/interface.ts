@@ -39,7 +39,7 @@ export interface LogBookDetail {
   count_min: number;
   logbook_note: string;
   logbook_drug: string;
-  logbook_sop: string;
+  logbook_sop: number;
   supervisor_nip: string;
   supervisor_name: string;
 }

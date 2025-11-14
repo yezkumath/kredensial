@@ -1,7 +1,6 @@
 "use client";
 import { ApplicationCard } from "@/connection/interface";
 import { useEffect, useState } from "react";
-import { Card, CardAction, CardContent } from "@/components/ui/card";
 import {
   Pagination,
   PaginationContent,

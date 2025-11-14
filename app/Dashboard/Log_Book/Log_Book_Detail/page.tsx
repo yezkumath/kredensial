@@ -3,14 +3,12 @@ import useSWR, { SWRConfiguration } from "swr";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 
-import {
-  GetCookieLogBook,
-  GetCookieDocumentLogBook,
-} from "@/function/cookie/logBook";
+import { GetCookieDocumentLogBook } from "@/function/cookie/logBook";
 import { GetLoginCookie } from "@/function/cookie/loginData";
 import { GET_logbook_detail } from "@/connection/log_book";
 import { LogBookDetail } from "@/connection/interface";
 import Log_Book_Detail from "@/components/pages/log_book/log_book_detail";
+import { GetCookieMedicalPersonal } from "@/function/cookie/medicalPersonnel";
 
 export default function Page() {
   const [nip, setNip] = useState("");
@@ -20,7 +18,8 @@ export default function Page() {
   }, []);
 
   const getInitial_Data = async () => {
-    let nip: string | null = await GetCookieLogBook();
+    let nip: string | null = await GetCookieMedicalPersonal();
+
     const id = await GetCookieDocumentLogBook();
     setId_document(id ?? -1);
     if (!nip) {
@@ -29,6 +28,7 @@ export default function Page() {
     }
     if (nip) {
       setNip(nip);
+      console.log("nip:", nip);
     }
   };
 
@@ -43,12 +43,10 @@ export default function Page() {
     LogBookDetail[] | null,
     Error
   >(
-    nip
-      ? id_document
-        ? `GET_logbook_detail-${id_document}-${nip}`
-        : null
-      : null, // unique key
+    nip && id_document ? `GET_logbook_detail-${id_document}-${nip}` : null, // uniq key
+
     async () => {
+      if (!nip || !id_document) return null;
       try {
         const result = await GET_logbook_detail(id_document, nip);
         return result;
@@ -75,7 +73,7 @@ export default function Page() {
       <div>
         <Log_Book_Detail
           data_logbook={data ?? []}
-          data_logbookMutate={mutate}
+          data_logbookMutate={async () => await mutate()}
         />
       </div>
     );

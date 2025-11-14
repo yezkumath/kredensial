@@ -6,6 +6,7 @@ import {
   executeTransaction, // untuk Update dan Delete sehingga historynya terekam
   executeInsertWithId, // for input and get the id (primary key) of the input item
 } from "../sqlExecutor";
+import { PATCH_DELETE_chapter } from "./question";
 
 //TABLE credential_document
 
@@ -392,6 +393,38 @@ export async function DELETE_credential_category(
   );
 }
 
+export async function DELETE_credential_category_using_id_document(
+  id_document: number
+) {
+  const loginData = await GetLoginCookie();
+  const create_nip = loginData?.nip;
+  return await executeTransaction(
+    [
+      {
+        query: `DELETE credential_category 
+                WHERE id_document=@id_document`,
+        params: { id_document },
+      },
+      {
+        query: `INSERT INTO credential_log_activity
+              (table_name, id_data, action_ontable, action_detail, create_nip)
+              VALUES
+              (@table_name, @id_data, @action_ontable, @action_detail, @create_nip)`,
+        params: {
+          table_name: "credential_category",
+          id_data: id_document,
+          action_ontable: "DELETE",
+          action_detail: "DELETE using id_document ",
+          create_nip: create_nip,
+        },
+      },
+    ],
+    `DELETE_credential_category_using_id_document
+    id_document: ${id_document}
+    create_nip: ${create_nip}`
+  );
+}
+
 export async function POST_credential_document_and_category_with_id(
   short_name: string,
   name_document: string,
@@ -604,5 +637,36 @@ export async function POST_copy_credential_hierarchy(
   } catch (error) {
     console.error("Error copying credential hierarchy:", error);
     return { success: false, message: "Failed to copy hierarchy", error };
+  }
+}
+
+//------------------------------------------DELETE ALL QUSTION WITH DOCUMENT
+// Main function to delete entire hierarchy
+
+export async function DELETE_credential_hierarchy(id_document: number) {
+  try {
+    const chapters = await GET_credential_chapters_by_document(id_document);
+
+    if (!chapters || chapters.length === 0) {
+      return { success: true, message: "No chapters to delete" };
+    }
+
+    //  it deletes everything at once!
+    for (const chapter of chapters) {
+      const result = await PATCH_DELETE_chapter(chapter.id);
+      if (!result) {
+        throw new Error(`Failed to delete chapter ${chapter.id}`);
+      }
+    }
+
+    // Delete the document itself
+    await DELETE_credential_document(id_document);
+
+    await DELETE_credential_category_using_id_document(id_document);
+
+    return { success: true, message: "Hierarchy deleted successfully" };
+  } catch (error) {
+    console.error("Error deleting credential hierarchy:", error);
+    return { success: false, message: "Failed to delete hierarchy", error };
   }
 }
